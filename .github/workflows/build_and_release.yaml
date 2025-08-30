@@ -1,0 +1,19 @@
+name: build_countingbook_app
+
+on: [ push ]
+
+jobs:
+  build_app:
+    runs-on: ubuntu-latest
+    steps:
+    - id: s01
+      run: echo "github ${{ github.ref_name }}"
+    # setup the environment
+    - run: echo "before " && ls -l
+    - id: s02
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24
+    - id: s03
+      uses: actions/checkout@v5
+    - run: echo "after " && ls -l
