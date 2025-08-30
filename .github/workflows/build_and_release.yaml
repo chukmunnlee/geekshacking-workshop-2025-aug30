@@ -9,11 +9,25 @@ jobs:
     - id: s01
       run: echo "github ${{ github.ref_name }}"
     # setup the environment
-    - run: echo "before " && ls -l
     - id: s02
       uses: actions/setup-node@v4
       with:
         node-version: 24
     - id: s03
       uses: actions/checkout@v5
-    - run: echo "after " && ls -l
+    - id: s04
+      # install Angular cli and install packages from package.json
+      run: npm i -g @angular/cli && npm ci && echo "Installed"
+    - id: s05
+      # build the application
+      run: ng build
+    - id: s06
+      run: ls -l dist/countingbook/browser/
+    - id: s07
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        publish-dir: dist/countingbook/browser
+        production-deploy: true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
