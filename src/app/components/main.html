@@ -1,0 +1,26 @@
+<div class="grid text-center mt-5">
+
+  <div class="g-col-4"></div>
+    <h1>My Numbers</h1>
+  <div class="g-col-4">
+  </div>
+  <div class="g-col-4"></div>
+
+  <div class="g-col-4"></div>
+  <div class="g-col-4">
+    <img src="/numbers/number{{imgIdx}}.jpg" class="img-fluid img-thumbnail" id="pic">
+  </div>
+  <div class="g-col-4"></div>
+
+  <div class="g-col-4 mt-3"></div>
+  <div class="g-col-4">
+    <button type="button" class="btn btn-danger me-5" (click)="update(-1)">
+      Previous
+    </button>
+    <button type="button" class="btn btn-primary ms-5" (click)="update(1)">
+      Next
+    </button>
+  </div>
+  <div class="g-col-4"></div>
+</div>
+
