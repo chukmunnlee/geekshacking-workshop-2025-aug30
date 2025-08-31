@@ -1,29 +1,39 @@
-name: build_countingbook_app
+name: build and release
 
-on: [ push ]
+
+on:
+  # git tag -a v1 -m 'first release'
+  # git push origin v1
+  release:
+    types: [ published ]
+  #push:
 
 jobs:
   build_app:
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '#NO_RUN')"
     steps:
+    - id: debug
+      run: echo ">>>> message- ${{ github.event.head_commit.message }}"
     - id: s01
-      run: echo "github ${{ github.ref_name }}"
-    # setup the environment
-    - id: s02
+      name: Setup node
       uses: actions/setup-node@v4
       with:
         node-version: 24
+    - id: s02
+      name: checkout source code
+      uses: actions/checkout@v4
     - id: s03
-      uses: actions/checkout@v5
+      name: install Angular and packages
+      run: npm i -g @angular/cli && npm ci
     - id: s04
-      # install Angular cli and install packages from package.json
-      run: npm i -g @angular/cli && npm ci && echo "Installed"
-    - id: s05
-      # build the application
+      name: build application
       run: ng build
+    - id: s05
+      name: List build directory
+      run: ls -lR dist
     - id: s06
-      run: ls -l dist/countingbook/browser/
-    - id: s07
+      name: deploy to netlify
       uses: nwtgck/actions-netlify@v3.0
       with:
         publish-dir: dist/countingbook/browser
@@ -31,3 +41,11 @@ jobs:
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    - id: s07
+      name: Send notification to Slack
+      uses: slackapi/slack-github-action@v2.1.1
+      with:
+        webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+        webhook-type: incoming-webhook
+        payload: |
+          text: "Deployed to ${{ steps.s06.outputs.deploy-url }}"
